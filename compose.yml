@@ -1,0 +1,64 @@
+services:
+  mongo:
+    image: 'mongo:latest'
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: <mongo admin username>
+      MONGO_INITDB_ROOT_PASSWORD: <mongo admin password>
+      MONGO_DB: test
+    volumes:
+      - my-data:/var/lib/mongodb/data
+      - ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    networks:
+      - p2code
+
+  mongo-exporter:
+    image: 'percona/mongodb_exporter:0.40.0'
+    environment:
+      MONGODB_URI: mongodb://<user>:<password>@mongo:27017
+    command: ["--collect-all", "--compatible-mode", "--discovering-mode"]
+    ports:
+    - 9216:9216
+    networks:
+      - p2code
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/:/etc/prometheus
+      - prom_data:/prometheus
+    networks:
+      - p2code
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=<gafana admin user>
+      - GF_SECURITY_ADMIN_PASSWORD=<gafana admin password>
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+    networks:
+      - p2code
+
+volumes:
+  prom_data:
+  my-data:
+
+networks:
+  p2code:
+    labels:
+      org.fiware: 'p2code'
+    ipam:
+      config:
+        - subnet: 172.18.1.0/24
