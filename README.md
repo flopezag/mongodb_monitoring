@@ -1,5 +1,5 @@
-# mongodb_monitoring
-Prometheus monitoring of a MongoDB instance and integration into Grafana UI
+# Prometheus Monitoring of DBs
+Prometheus monitoring of a MongoDB and PostgreSQL DB instances and integration into Grafana UI
 
 ## Configuration
 There are several parameters that need to be fixed in the deployment of the docker compose:
