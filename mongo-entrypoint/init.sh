@@ -5,13 +5,13 @@ mongosh <<EOF
 use admin
 
 var db = connect(
-  "mongodb://homestead:secret@localhost:27017/"
+  "mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@localhost:27017/"
 );
 
 db.createUser(
   {
-    user: 'homestead2',
-    pwd: 'secret',
+    user: '$MONGO_USER',
+    pwd: '$MONGO_PASSWORD',
     roles: [
         { role: "clusterMonitor", db: "admin" },
         { role: "readWrite", db: "$MONGO_DB" }
