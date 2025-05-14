@@ -5,8 +5,8 @@ services:
     ports:
       - "${MONGODB_PORT:-27017}:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGO_DB: ${MONGODB_DBNAME}
       MONGO_USER: ${MONGODB_USER}
       MONGO_PASSWORD: ${MONGODB_PASSWORD}
@@ -58,8 +58,10 @@ services:
     image: 'percona/mongodb_exporter:0.40.0'
     container_name: mongodb-exporter
     environment:
-        # MONGODB_URI: mongodb://<user>:<password>@mongo:27017
-        MONGODB_URI: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo/${MONGODB_DBNAME}?sslmode=disable:27017"
+      # MONGODB_URI: mongodb://<user>:<password>@mongo:27017
+      # MONGODB_URI: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo/${MONGODB_DBNAME}:27017"
+      MONGODB_URI: "mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongo:27017"
+      # mongodb://homestead:secret@localhost:27017/
     command: ["--collect-all", "--compatible-mode", "--discovering-mode"]
     depends_on:
       prometheus:
@@ -80,7 +82,6 @@ services:
       - "${PGSQL_EXPORTER_PORT:-9187}:9187"
     environment:
       DATA_SOURCE_NAME: "postgres://${PGSQL_USERNAME}:${PGSQL_PASSWORD}@postgresql/${PGSQL_DBNAME}?sslmode=disable"
-    command: ["--collect-all", "--compatible-mode", "--discovering-mode"]
     depends_on:
       prometheus:
         condition: service_started
